@@ -8,22 +8,30 @@ import (
 )
 
 func TestOfNullable_UsingDefaultValue(t *testing.T) {
-	current := OfNullable(nil).OrElse(1).Get()
+	current := OfNullable(nil).OrElse(1)
 	assertEqual(t, 1, current, "Value must be not null")
 }
 
 func TestOfNullable_UsingPassedValue(t *testing.T) {
-	current := OfNullable(3).OrElse(1).Get()
+	current := OfNullable(3).OrElse(1)
 	assertEqual(t, 3, current, "Value must be not null")
 }
 
 
 func TestOfNullable_DefaultValueAndMapping(t *testing.T) {
 
-	current := OfNullable(nil).OrElse(1).Map(func(o interface{}) interface{} {
+	current := OfNullable(nil).Map(func(o interface{}) interface{} {
 		return strconv.Itoa(o.(int))
-	}).Get()
-	assertEqual(t, "1", current, "")
+	}).OrElse("2")
+	assertEqual(t, "2", current, "")
+}
+
+func TestOfNullable_PassingNotNullValueAndMapping(t *testing.T) {
+
+	current := OfNullable(3).Map(func(o interface{}) interface{} {
+		return strconv.Itoa(o.(int))
+	}).OrElse("2")
+	assertEqual(t, "3", current, "")
 }
 
 

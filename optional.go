@@ -1,9 +1,12 @@
 package optional
 
+import "errors"
+
 type Optional interface {
 	Map(func(o interface{}) interface{}) Optional
-	OrElse(interface{}) Optional
-	Get() interface{}
+	OrElse(interface{}) interface{}
+	IsPresent() bool
+	Get() (interface{}, error)
 }
 
 type OptionalImpl struct {
@@ -11,19 +14,28 @@ type OptionalImpl struct {
 }
 
 func (op *OptionalImpl) Map(fn func(o interface{}) interface{}) Optional {
-	op.value = fn(op.value)
-	return op
-}
-
-func (op *OptionalImpl) OrElse(o interface{}) Optional {
-	if op.value == nil {
-		op.value = o
+	if op.IsPresent() {
+		op.value = fn(op.value)
 	}
 	return op
 }
 
-func (op *OptionalImpl)Get() interface{} {
-	return op.value
+func (op *OptionalImpl) OrElse(o interface{}) interface{} {
+	if op.IsPresent() {
+		return op.value
+	}
+	return o
+}
+
+func (op *OptionalImpl) Get() (interface{}, error) {
+	if op.IsPresent() {
+		return op.value, nil
+	}
+	return nil, errors.New("No such element")
+}
+
+func(op *OptionalImpl) IsPresent() bool {
+	return op.value != nil
 }
 
 func OfNullable(o interface{}) Optional {
