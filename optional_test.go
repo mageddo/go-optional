@@ -12,6 +12,13 @@ func TestOfNullable_UsingDefaultValue(t *testing.T) {
 	assertEqual(t, 1, current, "Value must be not null")
 }
 
+func TestOfNullable_UsingNilAsDefaultValue(t *testing.T) {
+	var n *int = nil
+	current := OfNullable(n)
+	assertEqual(t, false, current.IsPresent(), "Must be not present")
+	assertEqual(t, 1, current.OrElse(1), "Value must be not null")
+}
+
 func TestOfNullable_UsingPassedValue(t *testing.T) {
 	current := OfNullable(3).OrElse(1)
 	assertEqual(t, 3, current, "Value must be not null")

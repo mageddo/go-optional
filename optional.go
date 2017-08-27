@@ -1,6 +1,9 @@
 package optional
 
-import "errors"
+import (
+	"errors"
+	"reflect"
+)
 
 type Optional interface {
 	Map(func(o interface{}) interface{}) Optional
@@ -35,7 +38,14 @@ func (op *OptionalImpl) Get() (interface{}, error) {
 }
 
 func(op *OptionalImpl) IsPresent() bool {
-	return op.value != nil
+	if op.value == nil {
+		return false
+	}
+	r := reflect.ValueOf(op.value)
+	if r.Kind() == reflect.Ptr {
+		return !r.IsNil()
+	}
+	return true
 }
 
 func OfNullable(o interface{}) Optional {
